@@ -1,0 +1,69 @@
+# @itsammarb/mention-editor
+
+> A Discord-style `@mention` rich-text editor for React, built on Slate.js. Renders once, in a real contenteditable surface (no mirrored textarea/div overlay), so it doesn't suffer the cursor-drift bugs that affect that approach with mixed RTL/LTR text.
+
+## Install
+
+```sh
+npm install @itsammarb/mention-editor slate slate-react slate-history
+```
+
+Peer deps: React `^18.0.0 || ^19.0.0`, `slate` and `slate-react` `^0.94.0`. No Tailwind config needed on the consumer side — styling ships pre-compiled.
+
+## Minimal usage
+
+```tsx
+import { MentionEditor } from '@itsammarb/mention-editor';
+import '@itsammarb/mention-editor/styles.css'; // required once, anywhere in the app
+
+const fields = [{ id: 'a1b2c3d4-0000-0000-0000-000000000001', label: 'Landlord Name' }];
+
+function Example() {
+  const [value, setValue] = useState('Hello <@a1b2c3d4-0000-0000-0000-000000000001>, welcome.');
+  return <MentionEditor value={value} fields={fields} onChange={setValue} />;
+}
+```
+
+## Wire format (the `value`/`onChange` string, NOT a Slate document)
+
+- A mention is written as `<@` + the field's `id` + `>`, e.g. `<@a1b2c3d4-...>`.
+- `\n` in the string is a paragraph break.
+- Any id shape works (GUID, numeric, nanoid, ...) — the closing `>` disambiguates, no escaping/config needed.
+- `serialize(nodes: Descendant[]): string` and `deserialize(value: string, fields?: MentionFieldOption[]): Descendant[]` (both exported) convert between this string and Slate's internal tree, if you need to do that outside the component.
+- An id not present in the `fields` passed to `deserialize` still renders — falls back to showing the raw id as the label instead of dropping the mention.
+
+## Props (all on `MentionEditor`)
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `value` | `string` | yes | Wire-format content; component is fully controlled. |
+| `fields` | `{ id: string; label: string }[]` | yes | Candidates for the `@` menu; already filtered/localized by the caller — no built-in fetching. |
+| `onChange` | `(value: string) => void` | no | Fires on every edit with the new wire string. |
+| `dir` | `'ltr' \| 'rtl'` | no | Sets the real `dir` attribute on the editable surface; needed for correct RTL caret/bidi behavior. |
+| `disabled` | `boolean` | no, default `false` | Read-only + dimmed. |
+| `isError` | `boolean` | no, default `false` | Red border only; doesn't block input. |
+| `placeholder` | `string` | no | Shows only when the doc is exactly one empty paragraph. |
+| `rows` | `number` | no | `min-height = rows * 1.5em`, textarea-rows-equivalent; grows taller if content wraps further. |
+| `className` | `string` | no | Appended to the root container's class list. |
+
+## Other exports
+
+`MentionEditorProps` (type), `MentionFieldOption` (type), `INITIAL_VALUE` (empty-doc Slate value), `MENTION_OPEN` / `MENTION_CLOSE` (the `'<@'` / `'>'` delimiter constants), `serializeToDiscordMarkup` (deprecated alias of `serialize`).
+
+## Behavior that is fixed, not configurable via props
+
+- Trigger is always `@`; only fires at line-start or after whitespace (never mid-word, e.g. `user@`).
+- Suggestion menu shows top 10 case-insensitive substring matches on `label`.
+- Menu keys: `↑`/`↓` navigate, `Tab`/`Enter` select, `Escape` dismiss.
+- Undo/redo (`Ctrl/Cmd+Z`) works via `slate-history`.
+- A mention is atomic: one Backspace immediately after it deletes the whole node, never a partial one.
+- Mentions get `unicode-bidi: isolate` so an embedded Latin/digit label can't flip surrounding RTL paragraph reordering.
+- Built-in `dark:` styling follows OS `prefers-color-scheme`, not a manually toggled `.dark` class (e.g. `next-themes`) — override the `.mention-editor*` classes directly if you need class-driven dark mode.
+
+## Styling hook classes (all normal, single-class specificity — a later rule wins)
+
+`.mention-editor` (root), `.mention-editor__editable`, `.mention-editor__paragraph`, `.mention-editor__mention`, `.mention-editor__menu`, `.mention-editor__menu-item`.
+
+## Full docs
+
+See `README.md` in this package for the complete prop/export/styling reference and more detail on each point above.
