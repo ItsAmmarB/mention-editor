@@ -2,18 +2,17 @@ import { BaseEditor, Descendant } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { HistoryEditor } from 'slate-history';
 
-// The data structure of a mentionable item (User, Role, Channel)
-export interface MentionableItem {
+// A mentionable field/clause offered by the consuming app (already localized/filtered).
+export interface MentionFieldOption {
   id: string;
   label: string;
-  avatarColor?: string; // For styling like Discord
 }
 
 // Custom Slate Types
-export type CustomText = { text: string; bold?: boolean };
+export type CustomText = { text: string };
 export type MentionElement = {
   type: 'mention';
-  item: MentionableItem;
+  field: MentionFieldOption;
   children: CustomText[];
 };
 export type ParagraphElement = {
@@ -35,3 +34,7 @@ export const INITIAL_VALUE: Descendant[] = [
     children: [{ text: '' }],
   },
 ];
+
+// Delimiters wrapping a mention's id in the wire format, e.g. `<@a1b2c3d4-...>`.
+export const MENTION_OPEN = '<@';
+export const MENTION_CLOSE = '>';

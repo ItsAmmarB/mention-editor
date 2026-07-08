@@ -1,26 +1,41 @@
 {
-  "name": "react-text-mention",
+  "name": "@nexcore/mention-editor",
   "version": "1.0.0",
-  "description": "A Discord-like @mention input system using Slate.js",
+  "description": "A Discord-style @mention rich-text editor built on Slate.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "tsc && tailwindcss -i src/tailwind-entry.css -o dist/styles.css --minify",
+    "prepublishOnly": "npm run build",
+    "test": "vitest run"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
     "slate": "^0.94.0",
     "slate-react": "^0.94.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@tailwindcss/cli": "^4.3.2",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "slate": "^0.94.0",
     "slate-history": "^0.93.0",
     "slate-react": "^0.94.0",
-    "typescript": "^5.0.0"
+    "tailwindcss": "^4.3.2",
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.10"
   }
 }

@@ -1,4 +1,5 @@
-export { MentionInput } from './MentionInput';
-export { serializeToDiscordMarkup } from './serialize';
-export type { MentionableItem } from './types';
-export { INITIAL_VALUE } from './types';
+export { MentionEditor } from './MentionEditor';
+export type { MentionEditorProps } from './MentionEditor';
+export { serialize, deserialize, serializeToDiscordMarkup } from './serialize';
+export type { MentionFieldOption } from './types';
+export { INITIAL_VALUE, MENTION_OPEN, MENTION_CLOSE } from './types';

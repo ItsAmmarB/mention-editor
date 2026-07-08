@@ -1,0 +1,11 @@
+/*
+ * Compiled at package build time into dist/styles.css. Deliberately omits
+ * tailwindcss/preflight.css: this file is imported into a consumer's app
+ * alongside their own styles, and Preflight's global element reset (headings,
+ * buttons, etc.) would leak out of this component and clobber the rest of
+ * their page.
+ */
+@import 'tailwindcss/theme.css';
+@import 'tailwindcss/utilities.css';
+
+@source '../src';
