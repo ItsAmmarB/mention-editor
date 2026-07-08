@@ -197,7 +197,7 @@ export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
     <Slate key={generation} editor={editor} value={slateValue} onChange={handleChange}>
       <div className={rootClassName}>
         <Editable
-          className="mention-editor__editable min-h-[44px] px-3 py-2 text-base leading-6 text-gray-900 outline-none dark:text-gray-100"
+          className="mention-editor__editable min-h-11 px-3 py-2 text-base leading-6 text-gray-900 outline-none dark:text-gray-100"
           style={editableStyle}
           dir={dir}
           readOnly={disabled}
