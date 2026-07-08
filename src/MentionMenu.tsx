@@ -1,6 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { MentionFieldOption } from './types';
+import { MentionFieldOption, MentionEditorColors } from './types';
+import { colorsToCssVars } from './colors';
 
 interface MentionMenuProps {
   fields: MentionFieldOption[];
@@ -8,7 +9,15 @@ interface MentionMenuProps {
   onSelect: (field: MentionFieldOption) => void;
   onHover: (index: number) => void;
   targetRect: DOMRect | null;
+  colors?: MentionEditorColors;
 }
+
+const MENU_COLOR_KEYS: (keyof MentionEditorColors)[] = [
+  'menuBg',
+  'menuBorderColor',
+  'menuTextColor',
+  'menuHighlightBg',
+];
 
 export const MentionMenu: React.FC<MentionMenuProps> = ({
   fields,
@@ -16,6 +25,7 @@ export const MentionMenu: React.FC<MentionMenuProps> = ({
   onSelect,
   onHover,
   targetRect,
+  colors,
 }) => {
   if (!targetRect || fields.length === 0) return null;
 
@@ -26,6 +36,10 @@ export const MentionMenu: React.FC<MentionMenuProps> = ({
   // another modal: portaling to <body> means there's no transformed/positioned
   // ancestor between the menu and the viewport to throw off `fixed` coordinates.
   // The caller (MentionEditor) keeps `targetRect` fresh across scroll/resize.
+  //
+  // `colors` has to be applied here too, not just on `.mention-editor` -- this
+  // element is a portal child of `document.body`, a sibling of `.mention-editor`
+  // in the real DOM, so it wouldn't inherit color overrides set there.
   return createPortal(
     <div
       className="mention-editor__menu z-9999 w-70 max-h-75 overflow-y-auto rounded-md border py-1 shadow-lg border-(--mention-editor-menu-border-color,var(--color-gray-300)) dark:border-(--mention-editor-menu-border-color,var(--color-neutral-700)) bg-(--mention-editor-menu-bg,var(--color-white)) dark:bg-(--mention-editor-menu-bg,var(--color-neutral-800))"
@@ -33,6 +47,7 @@ export const MentionMenu: React.FC<MentionMenuProps> = ({
         position: 'fixed',
         top: targetRect.bottom + 8,
         left: targetRect.left,
+        ...colorsToCssVars(colors, MENU_COLOR_KEYS),
       }}
     >
       {fields.map((field, i) => (

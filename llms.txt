@@ -45,10 +45,11 @@ function Example() {
 | `placeholder` | `string` | no | Shows only when the doc is exactly one empty paragraph. |
 | `rows` | `number` | no | `min-height = rows * 1.5em`, textarea-rows-equivalent; grows taller if content wraps further. |
 | `className` | `string` | no | Appended to the root container's class list. |
+| `colors` | `MentionEditorColors` | no | Per-instance color overrides; see Theme colors below. Omitted keys keep the default. |
 
 ## Other exports
 
-`MentionEditorProps` (type), `MentionFieldOption` (type), `INITIAL_VALUE` (empty-doc Slate value), `MENTION_OPEN` / `MENTION_CLOSE` (the `'<@'` / `'>'` delimiter constants), `serializeToDiscordMarkup` (deprecated alias of `serialize`).
+`MentionEditorProps` (type), `MentionFieldOption` (type), `MentionEditorColors` (type), `INITIAL_VALUE` (empty-doc Slate value), `MENTION_OPEN` / `MENTION_CLOSE` (the `'<@'` / `'>'` delimiter constants), `serializeToDiscordMarkup` (deprecated alias of `serialize`).
 
 ## Behavior that is fixed, not configurable via props
 
@@ -64,13 +65,11 @@ function Example() {
 
 `.mention-editor` (root), `.mention-editor__editable`, `.mention-editor__paragraph`, `.mention-editor__mention`, `.mention-editor__menu`, `.mention-editor__menu-item`.
 
-## Theme colors (CSS custom properties)
+## Theme colors
 
-Set these at `:root`/`html`/`body` scope in your own global CSS (not scoped to `.mention-editor` — the suggestion menu portals to `document.body`, outside it) to retheme without touching classes:
+Use the `colors` prop, not CSS, to retheme -- e.g. `colors={{ mentionColor: '#16a34a', mentionBg: '#dcfce7', borderColor: '#db2777', menuHighlightBg: '#fde68a' }}`. Keys: `bg`, `textColor`, `borderColor`, `borderColorError`, `placeholderColor`, `mentionColor`, `mentionBg`, `menuBg`, `menuBorderColor`, `menuTextColor`, `menuHighlightBg`. Omitted keys keep the built-in default (which itself differs light vs. dark, following OS `prefers-color-scheme`). Each editor instance's `colors` is independent, and is correctly forwarded to that instance's own suggestion menu even though the menu renders through a React portal into `document.body`.
 
-`--mention-editor-bg`, `--mention-editor-text-color`, `--mention-editor-border-color`, `--mention-editor-border-color-error`, `--mention-editor-placeholder-color`, `--mention-editor-mention-color`, `--mention-editor-mention-bg`, `--mention-editor-menu-bg`, `--mention-editor-menu-border-color`, `--mention-editor-menu-text-color`, `--mention-editor-menu-highlight-bg`.
-
-Each has a light/dark default baked in as a `var(--x, fallback)` on the relevant utility class (no competing `:root` declaration in this package's own CSS), so setting one always wins regardless of stylesheet load order, and applies in both light and dark mode unless you scope your own override inside a `prefers-color-scheme` media query.
+Advanced: `colors` works by setting `--mention-editor-*` CSS custom properties inline; you can also set these directly in your own global CSS at `:root`/`html`/`body` scope (not `.mention-editor` -- the portaled menu sits outside it) as a page-wide fallback. An inline `colors` value always wins over a global CSS one.
 
 ## Full docs
 

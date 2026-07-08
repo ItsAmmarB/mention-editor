@@ -38,3 +38,19 @@ export const INITIAL_VALUE: Descendant[] = [
 // Delimiters wrapping a mention's id in the wire format, e.g. `<@a1b2c3d4-...>`.
 export const MENTION_OPEN = '<@';
 export const MENTION_CLOSE = '>';
+
+// Per-instance color overrides for `MentionEditor`. Omitted keys keep the
+// built-in default (see src/colors.ts for the CSS variable each maps to).
+export interface MentionEditorColors {
+  bg?: string;
+  textColor?: string;
+  borderColor?: string;
+  borderColorError?: string;
+  placeholderColor?: string;
+  mentionColor?: string;
+  mentionBg?: string;
+  menuBg?: string;
+  menuBorderColor?: string;
+  menuTextColor?: string;
+  menuHighlightBg?: string;
+}

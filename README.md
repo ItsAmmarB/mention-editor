@@ -60,6 +60,7 @@ Hello <@a1b2c3d4-0000-0000-0000-000000000001>, welcome.
 | `placeholder` | `string` | `undefined` (no placeholder) | Shown only when the document is fully empty (a single empty paragraph) — see [Behavior notes](#behavior-notes). |
 | `rows` | `number` | `undefined` (intrinsic `min-h-11`, ~44px) | Sets `min-height` to `rows * 1.5em`, textarea-`rows`-equivalent. The editor still grows taller than this if content wraps to more lines. |
 | `className` | `string` | `undefined` | Extra class name(s) appended to the root container, after the built-in ones — use this for layout (width, margin) or to override the built-in border/background. |
+| `colors` | `MentionEditorColors` | `undefined` (built-in defaults) | Per-instance color overrides — see [Theme colors](#theme-colors). Omitted keys keep their default. |
 
 ## Exported utilities
 
@@ -70,6 +71,7 @@ Everything importable from `@itsammarb/mention-editor`:
 | `MentionEditor` | component | The editor itself; see [Props](#props). |
 | `MentionEditorProps` | type | Prop types for `MentionEditor`. |
 | `MentionFieldOption` | type | Shape of an entry in `fields`: `{ id: string; label: string }`. |
+| `MentionEditorColors` | type | Shape of the `colors` prop — see [Theme colors](#theme-colors). |
 | `serialize(nodes: Descendant[]): string` | function | Converts a Slate `Descendant[]` tree to the wire-format string. Useful if you need to inspect/generate content outside the component (e.g. server-side). |
 | `deserialize(value: string, fields?: MentionFieldOption[]): Descendant[]` | function | Inverse of `serialize`. `fields` resolves each mention's label; an id not found in `fields` still renders, falling back to the raw id as its label. |
 | `serializeToDiscordMarkup` | function | Deprecated alias of `serialize`, kept for backwards compatibility with the pre-rename API. Prefer `serialize`. |
@@ -95,37 +97,43 @@ Override any of these by targeting the class directly in your own CSS, or via `c
 
 ### Theme colors
 
-Every color is also a CSS custom property, so you can retheme the whole component with a handful of variable declarations instead of overriding individual classes. Set them anywhere that's an ancestor of the whole page — `:root`, `html`, `body`, or a global stylesheet rule — **not** scoped to `.mention-editor` itself: the suggestion menu is rendered through a React portal directly into `document.body`, so it sits *outside* `.mention-editor` in the real DOM and wouldn't inherit a variable scoped there.
+Pass a `colors` prop to override any of the built-in colors, per instance — no external CSS needed:
 
-```css
-/* anywhere in your global CSS, loaded in any order relative to this package's styles.css */
-:root {
-  --mention-editor-mention-color: #16a34a; /* green mention text/underline */
-  --mention-editor-mention-bg: #dcfce7; /* optional pill-style highlight behind a mention */
-  --mention-editor-border-color: #db2777;
-  --mention-editor-menu-highlight-bg: #fde68a; /* selected/hovered suggestion row */
-}
+```tsx
+<MentionEditor
+  value={value}
+  fields={fields}
+  onChange={setValue}
+  colors={{
+    mentionColor: '#16a34a', // green mention text/underline
+    mentionBg: '#dcfce7', // optional pill-style highlight behind a mention
+    borderColor: '#db2777',
+    menuHighlightBg: '#fde68a', // selected/hovered suggestion row
+  }}
+/>
 ```
 
-| Variable | Controls | Light default | Dark default |
+Omitted keys keep their built-in default, and different instances on the same page can have entirely different `colors` without affecting each other — including each instance's own suggestion menu, even though the menu renders through a React portal into `document.body` (a sibling of the editor in the real DOM, not a descendant): `MentionEditor` forwards `colors` to it directly rather than relying on CSS inheritance.
+
+| `colors` key | Controls | Light default | Dark default |
 | --- | --- | --- | --- |
-| `--mention-editor-bg` | Editor container background | white | neutral-900 |
-| `--mention-editor-text-color` | Editor body text color | gray-900 | gray-100 |
-| `--mention-editor-border-color` | Container border (normal state) | gray-300 | neutral-700 |
-| `--mention-editor-border-color-error` | Container border when `isError` | red-500 | red-500 (same in both) |
-| `--mention-editor-placeholder-color` | Placeholder text color | gray-400 | neutral-500 |
-| `--mention-editor-mention-color` | A mention's text/underline color | blue-600 | blue-400 |
-| `--mention-editor-mention-bg` | Background behind a mention (e.g. a pill highlight) | transparent | transparent |
-| `--mention-editor-menu-bg` | Suggestion menu background | white | neutral-800 |
-| `--mention-editor-menu-border-color` | Suggestion menu border | gray-300 | neutral-700 |
-| `--mention-editor-menu-text-color` | Suggestion menu row text | gray-900 | gray-100 |
-| `--mention-editor-menu-highlight-bg` | Selected/hovered suggestion row background | indigo-50 | neutral-700 |
+| `bg` | Editor container background | white | neutral-900 |
+| `textColor` | Editor body text color | gray-900 | gray-100 |
+| `borderColor` | Container border (normal state) | gray-300 | neutral-700 |
+| `borderColorError` | Container border when `isError` | red-500 | red-500 (same in both) |
+| `placeholderColor` | Placeholder text color | gray-400 | neutral-500 |
+| `mentionColor` | A mention's text/underline color | blue-600 | blue-400 |
+| `mentionBg` | Background behind a mention (e.g. a pill highlight) | transparent | transparent |
+| `menuBg` | Suggestion menu background | white | neutral-800 |
+| `menuBorderColor` | Suggestion menu border | gray-300 | neutral-700 |
+| `menuTextColor` | Suggestion menu row text | gray-900 | gray-100 |
+| `menuHighlightBg` | Selected/hovered suggestion row background | indigo-50 | neutral-700 |
 
-Setting a variable applies it in both light and dark mode (the fallback is what differs by scheme, not the override) — if you want genuinely different override colors per scheme, redeclare the variable yourself inside your own `@media (prefers-color-scheme: dark)` block.
+A `colors` value applies in both light and dark mode (the fallback is what differs by scheme, not your override) — if you want genuinely different colors per scheme, read `window.matchMedia('(prefers-color-scheme: dark)')` (or your app's own dark-mode state) and pass a different `colors` object accordingly.
 
-These defaults aren't asserted anywhere as a real `:root` rule in this package's stylesheet — they're inline `var(--x, fallback)` fallbacks on each utility class instead. That's deliberate: a real default declaration and a consumer override would both be equal-specificity `:root` rules, so whichever stylesheet happened to load *last* would silently win regardless of intent. Reading the variable with an inline fallback means there's only ever one real assignment (yours, if you set one), so load order can't matter.
+**Dark mode**: the built-in dark defaults (used when `colors` doesn't set a given key) respond to the OS/browser's `prefers-color-scheme: dark`, *not* a manually-toggled `.dark` class (e.g. from `next-themes` or a similar library). If your app drives dark mode via a class rather than OS preference, either pass `colors` explicitly (bypassing the scheme-based default entirely), or drive it from your own dark-mode state as described above.
 
-**Dark mode**: the built-in dark defaults respond to the OS/browser's `prefers-color-scheme: dark`, *not* a manually-toggled `.dark` class (e.g. from `next-themes` or a similar library). If your app drives dark mode via a class rather than OS preference, set the variables above directly (they'll then apply regardless of scheme), or scope your own overrides under your app's dark-mode class selector.
+**Advanced — global CSS override**: under the hood, `colors` works by setting CSS custom properties (`--mention-editor-*`) inline. You can also set these directly in your own global CSS (`:root { --mention-editor-mention-color: ...; }`) as a page-wide fallback for instances that don't pass `colors` at all — an inline `colors` value always takes precedence over a global CSS one. Global CSS declarations must be scoped to `:root`/`html`/`body` (not `.mention-editor`) for the same portal reason as above.
 
 If your own app happens to use Tailwind and you want to reuse its utility classes against this component's internal DOM (beyond what `className` on the root reaches), you can optionally point your app's Tailwind config/`@source` at `node_modules/@itsammarb/mention-editor/dist` — but this is purely an opt-in extra, not required for the component to work or look right.
 

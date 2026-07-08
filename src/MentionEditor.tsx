@@ -2,8 +2,9 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from '
 import { createEditor, Descendant, Editor, Transforms, Range } from 'slate';
 import { Slate, Editable, ReactEditor, RenderPlaceholderProps, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
-import { MentionFieldOption, INITIAL_VALUE } from './types';
+import { MentionFieldOption, MentionEditorColors, INITIAL_VALUE } from './types';
 import { serialize, deserialize } from './serialize';
+import { colorsToCssVars } from './colors';
 import { MentionMenu } from './MentionMenu';
 
 export interface MentionEditorProps {
@@ -19,7 +20,19 @@ export interface MentionEditorProps {
   /** Approximate visible height, textarea-`rows`-equivalent. */
   rows?: number;
   className?: string;
+  /** Per-instance color overrides; omitted keys keep the built-in default. */
+  colors?: MentionEditorColors;
 }
+
+const EDITOR_COLOR_KEYS: (keyof MentionEditorColors)[] = [
+  'bg',
+  'textColor',
+  'borderColor',
+  'borderColorError',
+  'placeholderColor',
+  'mentionColor',
+  'mentionBg',
+];
 
 export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
   const {
@@ -32,6 +45,7 @@ export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
     placeholder,
     rows,
     className,
+    colors,
   } = props;
 
   // `generation` forces a full remount of the Slate editor instance whenever the
@@ -195,10 +209,13 @@ export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
     .join(' ');
 
   const editableStyle = rows ? { minHeight: `${rows * 1.5}em` } : undefined;
+  // Set on the root: cascades naturally to Editable/mention/placeholder since
+  // they're real DOM descendants (unlike the portaled menu -- see MentionMenu).
+  const rootStyle = colorsToCssVars(colors, EDITOR_COLOR_KEYS);
 
   return (
     <Slate key={generation} editor={editor} value={slateValue} onChange={handleChange}>
-      <div className={rootClassName}>
+      <div className={rootClassName} style={rootStyle}>
         <Editable
           className="mention-editor__editable min-h-11 px-3 py-2 text-base leading-6 outline-none text-(--mention-editor-text-color,var(--color-gray-900)) dark:text-(--mention-editor-text-color,var(--color-gray-100))"
           style={editableStyle}
@@ -216,6 +233,7 @@ export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
             onSelect={selectField}
             onHover={setIndex}
             targetRect={menuTargetRect}
+            colors={colors}
           />
         )}
       </div>
