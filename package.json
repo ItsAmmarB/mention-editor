@@ -1,6 +1,6 @@
 {
 	"name": "@itsammarb/mention-editor",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "A Discord-style @mention rich-text editor built on Slate.js",
 	"license": "MIT",
 	"main": "dist/index.js",
