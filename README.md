@@ -1,14 +1,14 @@
 # @itsammarb/mention-editor
 
 <p align="center">
+  <a href="https://github.com/ItsAmmarB/mention-editor/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/ItsAmmarB/mention-editor.svg" alt="LICENSE" />
+  </a>
   <a href="https://www.npmjs.com/package/@itsammarb/mention-editor">
     <img src="https://img.shields.io/npm/v/@itsammarb/mention-editor.svg" alt="NPM Version" />
   </a>
   <a href="https://www.npmjs.com/package/@itsammarb/mention-editor">
     <img src="https://img.shields.io/npm/dm/@itsammarb/mention-editor.svg" alt="NPM Downloads" />
-  </a>
-  <a href="https://github.com/ItsAmmarB/mention-editor/actions">
-    <img src="https://github.com/ItsAmmarB/mention-editor/actions/workflows/public.yml/badge.svg" alt="Build Status" />
   </a>
 </p>
 
