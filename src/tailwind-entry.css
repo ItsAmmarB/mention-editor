@@ -9,3 +9,14 @@
 @import 'tailwindcss/utilities.css';
 
 @source '../src';
+
+/*
+ * Theme variables (--mention-editor-*) are referenced directly in each utility
+ * class via `var(--x, fallback)` rather than assigned here at `:root`.
+ * Deliberately -- a `:root` assignment in *our* stylesheet and a consumer's
+ * own `:root` override would both be equal-specificity `:root` rules, so
+ * whichever stylesheet happens to load last in the page would silently win.
+ * Reading the variable with an inline fallback avoids that race entirely:
+ * there is only ever one real assignment (the consumer's, if any), so load
+ * order can't matter.
+ */

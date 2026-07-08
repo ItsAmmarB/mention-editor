@@ -64,6 +64,14 @@ function Example() {
 
 `.mention-editor` (root), `.mention-editor__editable`, `.mention-editor__paragraph`, `.mention-editor__mention`, `.mention-editor__menu`, `.mention-editor__menu-item`.
 
+## Theme colors (CSS custom properties)
+
+Set these at `:root`/`html`/`body` scope in your own global CSS (not scoped to `.mention-editor` — the suggestion menu portals to `document.body`, outside it) to retheme without touching classes:
+
+`--mention-editor-bg`, `--mention-editor-text-color`, `--mention-editor-border-color`, `--mention-editor-border-color-error`, `--mention-editor-placeholder-color`, `--mention-editor-mention-color`, `--mention-editor-mention-bg`, `--mention-editor-menu-bg`, `--mention-editor-menu-border-color`, `--mention-editor-menu-text-color`, `--mention-editor-menu-highlight-bg`.
+
+Each has a light/dark default baked in as a `var(--x, fallback)` on the relevant utility class (no competing `:root` declaration in this package's own CSS), so setting one always wins regardless of stylesheet load order, and applies in both light and dark mode unless you scope your own override inside a `prefers-color-scheme` media query.
+
 ## Full docs
 
 See `README.md` in this package for the complete prop/export/styling reference and more detail on each point above.

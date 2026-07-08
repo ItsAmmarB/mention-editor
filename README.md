@@ -1,11 +1,11 @@
-# @nexcore/mention-editor
+# @itsammarb/mention-editor
 
 A Discord-style `@mention` rich-text editor built on [Slate.js](https://www.slatejs.org/). Mentions are atomic (void + inline) nodes: backspacing next to one deletes it whole, and the suggestion menu tracks the real caret position via `ReactEditor.toDOMRange`.
 
 ## Install
 
 ```sh
-npm install @nexcore/mention-editor slate slate-react slate-history
+npm install @itsammarb/mention-editor slate slate-react slate-history
 ```
 
 Peer dependencies: React 18 or 19, `slate` and `slate-react` `^0.94.0`. No Tailwind setup required on your end — see [Styling](#styling).
@@ -13,8 +13,8 @@ Peer dependencies: React 18 or 19, `slate` and `slate-react` `^0.94.0`. No Tailw
 ## Usage
 
 ```tsx
-import { MentionEditor } from '@nexcore/mention-editor';
-import '@nexcore/mention-editor/styles.css';
+import { MentionEditor } from '@itsammarb/mention-editor';
+import '@itsammarb/mention-editor/styles.css';
 
 const fields = [
   { id: 'a1b2c3d4-0000-0000-0000-000000000001', label: 'Landlord Name' },
@@ -63,7 +63,7 @@ Hello <@a1b2c3d4-0000-0000-0000-000000000001>, welcome.
 
 ## Exported utilities
 
-Everything importable from `@nexcore/mention-editor`:
+Everything importable from `@itsammarb/mention-editor`:
 
 | Export | Kind | Description |
 | --- | --- | --- |
@@ -93,9 +93,41 @@ Every rendered part carries a stable class name, at normal specificity (plain si
 
 Override any of these by targeting the class directly in your own CSS, or via `className` on the root for layout/border/background changes.
 
-**Dark mode**: the built-in `dark:` utilities respond to the OS/browser's `prefers-color-scheme: dark`, *not* a manually-toggled `.dark` class (e.g. from `next-themes` or a similar library). If your app drives dark mode via a class rather than OS preference, the shipped dark colors won't follow it — override `.mention-editor`, `.mention-editor__mention`, etc. directly with your own class-scoped CSS in that case.
+### Theme colors
 
-If your own app happens to use Tailwind and you want to reuse its utility classes against this component's internal DOM (beyond what `className` on the root reaches), you can optionally point your app's Tailwind config/`@source` at `node_modules/@nexcore/mention-editor/dist` — but this is purely an opt-in extra, not required for the component to work or look right.
+Every color is also a CSS custom property, so you can retheme the whole component with a handful of variable declarations instead of overriding individual classes. Set them anywhere that's an ancestor of the whole page — `:root`, `html`, `body`, or a global stylesheet rule — **not** scoped to `.mention-editor` itself: the suggestion menu is rendered through a React portal directly into `document.body`, so it sits *outside* `.mention-editor` in the real DOM and wouldn't inherit a variable scoped there.
+
+```css
+/* anywhere in your global CSS, loaded in any order relative to this package's styles.css */
+:root {
+  --mention-editor-mention-color: #16a34a; /* green mention text/underline */
+  --mention-editor-mention-bg: #dcfce7; /* optional pill-style highlight behind a mention */
+  --mention-editor-border-color: #db2777;
+  --mention-editor-menu-highlight-bg: #fde68a; /* selected/hovered suggestion row */
+}
+```
+
+| Variable | Controls | Light default | Dark default |
+| --- | --- | --- | --- |
+| `--mention-editor-bg` | Editor container background | white | neutral-900 |
+| `--mention-editor-text-color` | Editor body text color | gray-900 | gray-100 |
+| `--mention-editor-border-color` | Container border (normal state) | gray-300 | neutral-700 |
+| `--mention-editor-border-color-error` | Container border when `isError` | red-500 | red-500 (same in both) |
+| `--mention-editor-placeholder-color` | Placeholder text color | gray-400 | neutral-500 |
+| `--mention-editor-mention-color` | A mention's text/underline color | blue-600 | blue-400 |
+| `--mention-editor-mention-bg` | Background behind a mention (e.g. a pill highlight) | transparent | transparent |
+| `--mention-editor-menu-bg` | Suggestion menu background | white | neutral-800 |
+| `--mention-editor-menu-border-color` | Suggestion menu border | gray-300 | neutral-700 |
+| `--mention-editor-menu-text-color` | Suggestion menu row text | gray-900 | gray-100 |
+| `--mention-editor-menu-highlight-bg` | Selected/hovered suggestion row background | indigo-50 | neutral-700 |
+
+Setting a variable applies it in both light and dark mode (the fallback is what differs by scheme, not the override) — if you want genuinely different override colors per scheme, redeclare the variable yourself inside your own `@media (prefers-color-scheme: dark)` block.
+
+These defaults aren't asserted anywhere as a real `:root` rule in this package's stylesheet — they're inline `var(--x, fallback)` fallbacks on each utility class instead. That's deliberate: a real default declaration and a consumer override would both be equal-specificity `:root` rules, so whichever stylesheet happened to load *last* would silently win regardless of intent. Reading the variable with an inline fallback means there's only ever one real assignment (yours, if you set one), so load order can't matter.
+
+**Dark mode**: the built-in dark defaults respond to the OS/browser's `prefers-color-scheme: dark`, *not* a manually-toggled `.dark` class (e.g. from `next-themes` or a similar library). If your app drives dark mode via a class rather than OS preference, set the variables above directly (they'll then apply regardless of scheme), or scope your own overrides under your app's dark-mode class selector.
+
+If your own app happens to use Tailwind and you want to reuse its utility classes against this component's internal DOM (beyond what `className` on the root reaches), you can optionally point your app's Tailwind config/`@source` at `node_modules/@itsammarb/mention-editor/dist` — but this is purely an opt-in extra, not required for the component to work or look right.
 
 ## Behavior notes
 

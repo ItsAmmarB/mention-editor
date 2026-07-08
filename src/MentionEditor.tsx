@@ -183,8 +183,11 @@ export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
   );
 
   const rootClassName = [
-    'mention-editor relative rounded-md border bg-white dark:bg-neutral-900',
-    isError ? 'border-red-500' : 'border-gray-300 dark:border-neutral-700',
+    'mention-editor relative rounded-md border',
+    'bg-(--mention-editor-bg,var(--color-white)) dark:bg-(--mention-editor-bg,var(--color-neutral-900))',
+    isError
+      ? 'border-(--mention-editor-border-color-error,var(--color-red-500))'
+      : 'border-(--mention-editor-border-color,var(--color-gray-300)) dark:border-(--mention-editor-border-color,var(--color-neutral-700))',
     disabled && 'opacity-60',
     className,
   ]
@@ -197,7 +200,7 @@ export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
     <Slate key={generation} editor={editor} value={slateValue} onChange={handleChange}>
       <div className={rootClassName}>
         <Editable
-          className="mention-editor__editable min-h-11 px-3 py-2 text-base leading-6 text-gray-900 outline-none dark:text-gray-100"
+          className="mention-editor__editable min-h-11 px-3 py-2 text-base leading-6 outline-none text-(--mention-editor-text-color,var(--color-gray-900)) dark:text-(--mention-editor-text-color,var(--color-gray-100))"
           style={editableStyle}
           dir={dir}
           readOnly={disabled}
@@ -224,7 +227,11 @@ export function MentionEditor(props: MentionEditorProps): React.JSX.Element {
 // which reads poorly in dark mode. Overriding it lets the placeholder use
 // real (theme-aware) Tailwind colors at full opacity instead.
 const renderPlaceholder = ({ attributes, children }: RenderPlaceholderProps) => (
-  <span {...attributes} style={{ ...attributes.style, opacity: 1 }} className="text-gray-400 dark:text-neutral-500">
+  <span
+    {...attributes}
+    style={{ ...attributes.style, opacity: 1 }}
+    className="text-(--mention-editor-placeholder-color,var(--color-gray-400)) dark:text-(--mention-editor-placeholder-color,var(--color-neutral-500))"
+  >
     {children}
   </span>
 );
@@ -329,7 +336,7 @@ const Element: React.FC<{
         <span
           {...attributes}
           contentEditable={false}
-          className="mention-editor__mention cursor-default text-blue-600 underline decoration-1 underline-offset-2 [unicode-bidi:isolate] dark:text-blue-400"
+          className="mention-editor__mention cursor-default underline decoration-1 underline-offset-2 [unicode-bidi:isolate] text-(--mention-editor-mention-color,var(--color-blue-600)) dark:text-(--mention-editor-mention-color,var(--color-blue-400)) bg-(--mention-editor-mention-bg,transparent)"
         >
           @{element.field?.label}
           {children}

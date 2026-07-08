@@ -28,7 +28,7 @@ export const MentionMenu: React.FC<MentionMenuProps> = ({
   // The caller (MentionEditor) keeps `targetRect` fresh across scroll/resize.
   return createPortal(
     <div
-      className="mention-editor__menu z-[9999] w-[280px] max-h-[300px] overflow-y-auto rounded-md border border-gray-300 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+      className="mention-editor__menu z-9999 w-70 max-h-75 overflow-y-auto rounded-md border py-1 shadow-lg border-(--mention-editor-menu-border-color,var(--color-gray-300)) dark:border-(--mention-editor-menu-border-color,var(--color-neutral-700)) bg-(--mention-editor-menu-bg,var(--color-white)) dark:bg-(--mention-editor-menu-bg,var(--color-neutral-800))"
       style={{
         position: 'fixed',
         top: targetRect.bottom + 8,
@@ -39,8 +39,13 @@ export const MentionMenu: React.FC<MentionMenuProps> = ({
         <div
           key={field.id}
           className={
-            'mention-editor__menu-item cursor-pointer px-3 py-2 text-gray-900 dark:text-gray-100' +
-            (i === selectedIndex ? ' bg-indigo-50 dark:bg-neutral-700' : '')
+            'mention-editor__menu-item cursor-pointer px-3 py-2' +
+            ' text-(--mention-editor-menu-text-color,var(--color-gray-900))' +
+            ' dark:text-(--mention-editor-menu-text-color,var(--color-gray-100))' +
+            (i === selectedIndex
+              ? ' bg-(--mention-editor-menu-highlight-bg,var(--color-indigo-50))' +
+                ' dark:bg-(--mention-editor-menu-highlight-bg,var(--color-neutral-700))'
+              : '')
           }
           onClick={(e) => {
             e.preventDefault();
